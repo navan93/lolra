@@ -7,7 +7,7 @@ CH32V003FUN:=../ch32v003fun/ch32v003fun
 
 EXTRA_CFLAGS:=-Wno-unused-function -I../../lib -I../lib -I../ch32v003fun/examples_v20x/otg_device -I.
 
-include ../ch32v003fun/ch32v003fun/ch32v003fun.mk
+include ../ch32v003fun/ch32fun/ch32fun.mk
 
 flash : cv_flash
 clean : cv_clean

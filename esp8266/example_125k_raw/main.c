@@ -174,7 +174,7 @@ void slc_isr(void * v) {
 	//
 	// Very few combinations of clock rate, divisor, etc can produce
 	// perfect divisors. Most notably 52MHz, /2 SF9 can produce a perfect
-	// divisor.  While this is very tidy and beautiful that the 
+	// divisor.  While this is very tidy and beautiful that the
 	// words would align perfectly, the actual difference it makes on
 	// LoRa's ability to receive the message is minimal.
 	//
@@ -295,7 +295,7 @@ int main()
 		call_delay_us(2000000);
 
 		// Just some random data.
-		uint8_t payload_in[259] = { 0xbb, 0xcc, 0xde, 0x55, 0x22,}; 
+		uint8_t payload_in[259] = { 'l', 'o', 'l', 'r', 'a', 0};
 		int payload_in_size = 6;
 
 		static int msgno = 0;

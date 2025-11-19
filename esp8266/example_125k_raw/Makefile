@@ -1,4 +1,4 @@
-all : chirpbuff.dat.flash 
+all : chirpbuff.dat.flash
 
 SUBMODULE=YES
 SRCPREFIX=../nosdk8266/

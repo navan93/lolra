@@ -3,4 +3,5 @@
 	url = https://github.com/cnlohr/nosdk8266
 [submodule "ch32v/ch32v003fun"]
 	path = ch32v/ch32v003fun
-	url = https://github.com/cnlohr/ch32v003fun
+	url = https://github.com/navan93/ch32fun.git
+	# branch = add_ch32v203_usbd

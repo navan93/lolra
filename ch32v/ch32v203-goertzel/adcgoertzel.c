@@ -54,10 +54,10 @@ SOFTWARE.
 // TODO:
 // 1: Cleanup some code.
 // 2: Leverage other ADC.
-// 3: 
+// 3:
 
 
-#include "ch32v003fun.h"
+#include "ch32fun.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -101,7 +101,8 @@ int g_volume_pwm = 127; // 0 - 127 (100%) (but you can go over 100) (For when us
 
 
 #include "./usb_config.h"
-#include "../ch32v003fun/examples_v20x/otg_device/otgusb.h"
+// #include "../ch32v003fun/examples_v20x/otg_device/otgusb.h"
+#include "../ch32v003fun/examples_v20x/usbdevice/usbdevice.h"
 
 // Bigger buffer decreases chance of fall-through, but increases the size of each operation.
 #define ADC_BUFFSIZE 512
@@ -137,7 +138,7 @@ void SetupADC()
 
 	// PDA is analog input chl CHANNEL
 	GPIOA->CFGLR &= ~(0xf<<(4*CHANNEL));	// CNF = 00: Analog, MODE = 00: Input
-	
+
 	// ADC CLK is chained off of APB2.
 
 	// Reset the ADC to init all regs
@@ -164,8 +165,8 @@ void SetupADC()
 
 	// Turn on ADC and set rule group to sw trig
 	// 0 = Use TRGO event for Timer 1 to fire ADC rule.
-	ADC1->CTLR2 = ADC_ADON | ADC_EXTTRIG | ADC_DMA; 
-	ADC2->CTLR2 = ADC_ADON | ADC_EXTTRIG | ADC_EXTSEL_1;// | ADC_DMA; 
+	ADC1->CTLR2 = ADC_ADON | ADC_EXTTRIG | ADC_DMA;
+	ADC2->CTLR2 = ADC_ADON | ADC_EXTTRIG | ADC_EXTSEL_1;// | ADC_DMA;
 		// For EXTTRIG, EXTSEL (none) = 0 = TIM1CC1 /
 		// For JEXTTRIG, EXTSEL = 0 = TIM1 TRGO  (Or ADC_JEXTSEL_0 => CH4)
 
@@ -183,7 +184,7 @@ void SetupADC()
 
 	// ADC_SCAN: Allow scanning.
 	ADC2->CTLR1 = ADC_SCAN;
-	ADC1->CTLR1 = 
+	ADC1->CTLR1 =
 		//ADC_DUALMOD_0 | ADC_DUALMOD_3 | // Alternate Trigger Mode (Can't use with DMA)
 		ADC_SCAN;
 		//ADC_Pga_16 | ADC_BUFEN ;
@@ -197,7 +198,7 @@ void SetupADC()
 	DMA1_Channel1->MADDR = (uint32_t)adc_buffer;
 	DMA1_Channel1->CNTR  = ADC_BUFFSIZE/2;
 	DMA1_Channel1->CFGR  =
-		DMA_M2M_Disable |		 
+		DMA_M2M_Disable |
 		DMA_Priority_VeryHigh |
 		DMA_MemoryDataSize_Word |
 		DMA_PeripheralDataSize_Word |
@@ -206,8 +207,8 @@ void SetupADC()
 		DMA_DIR_PeripheralSRC;
 
 	NVIC_EnableIRQ( DMA1_Channel1_IRQn );
-	DMA1_Channel1->CFGR |= DMA_CFGR1_EN | DMA_IT_TC | DMA_IT_HT; // Transmission Complete + Half Empty Interrupts. 
-	
+	DMA1_Channel1->CFGR |= DMA_CFGR1_EN | DMA_IT_TC | DMA_IT_HT; // Transmission Complete + Half Empty Interrupts.
+
 	// Enable continuous conversion and DMA
 	ADC1->CTLR2 |= ADC_DMA; // | ADC_CONT;
 }
@@ -266,7 +267,7 @@ void config_turbo_scope()
 	DMA1_Channel3->MADDR = (uint32_t)cmdxy;
 	DMA1_Channel3->CNTR  = sizeof(cmdxy);
 	DMA1_Channel3->CFGR  =
-		DMA_M2M_Disable |		 
+		DMA_M2M_Disable |
 		DMA_Priority_Low |
 		DMA_MemoryDataSize_Byte |
 		DMA_PeripheralDataSize_Byte |
@@ -316,7 +317,7 @@ int32_t g_lastlen;
 uint32_t g_accumulate_over_window;
 
 void DMA1_Channel1_IRQHandler( void ) __attribute__((interrupt));
-void DMA1_Channel1_IRQHandler( void ) 
+void DMA1_Channel1_IRQHandler( void )
 {
 	int32_t start = SysTick->CNT;
 #ifdef PROFILING_PIN
@@ -342,7 +343,7 @@ void DMA1_Channel1_IRQHandler( void )
 		// Clear all possible flags.
 		DMA1->INTFCR = DMA1_IT_GL1;
 
-		int tpl = ADC_BUFFSIZE - DMA1_Channel1->CNTR*2; 
+		int tpl = ADC_BUFFSIZE - DMA1_Channel1->CNTR*2;
 		// Warning, sometimes this is DMA1_Channel1->CNTR == to the base, or == 0 (i.e. might be 256, if top is 255)
 
 		tpl += ADC_BUFFSIZE;
@@ -425,7 +426,7 @@ void DMA1_Channel1_IRQHandler( void )
 				int32_t rr = (((int64_t)(g_goertzel_coefficient  ) * (int64_t)zp<<1)>>(32+g_attenuation_pow2)) - (zp2>>g_attenuation_pow2);
 				int32_t ri = (((int64_t)(g_goertzel_coefficient_s) * (int64_t)zp<<1)>>(32+g_attenuation_pow2));
 
-				// Advanced the current goertzel advance 
+				// Advanced the current goertzel advance
 				// phasor = phasor * advance;
 				//  real = real * real - imag * imag;
 				//  imag = real * imag + real * imag;
@@ -450,7 +451,7 @@ void DMA1_Channel1_IRQHandler( void )
 
 				// Now, rotate rr, ri by that phasor.
 				// To get it in line >> 15, but we also want to divide by 8 (>>3) because that makes the rest of the math easier.
-				temp = (g_goertzel_phasor_r * ri + g_goertzel_phasor_i * rr) >> (15); 
+				temp = (g_goertzel_phasor_r * ri + g_goertzel_phasor_i * rr) >> (15);
 				rr = (g_goertzel_phasor_r * rr - g_goertzel_phasor_i * ri) >> (15);
 				ri = temp;
 
@@ -547,13 +548,13 @@ void setup_i2c_dma(void)
 	DMA1_Channel6->MADDR = (uint32_t)&i2c_send_buffer;
 	DMA1_Channel6->CNTR  = 0;
 	DMA1_Channel6->CFGR  =
-		DMA_M2M_Disable |		 
+		DMA_M2M_Disable |
 		DMA_Priority_Low |
 		DMA_MemoryDataSize_Byte |
 		DMA_PeripheralDataSize_Byte |
 		DMA_MemoryInc_Enable |
 		DMA_Mode_Normal |
-		DMA_DIR_PeripheralDST | 
+		DMA_DIR_PeripheralDST |
 		0;
 	I2C1->CTLR2 = I2C_CTLR2_DMAEN | 0b111100;
 
@@ -670,7 +671,8 @@ int main()
 
 	SetupTimer1();
 
-	USBOTGSetup();
+	// USBOTGSetup();
+	USBDSetup();
 
 
 	while(1){
@@ -711,7 +713,7 @@ int main()
 			if( ri < 0 ) ri = 0;
 			if( rr > 127 ) rr = 127;
 			if( ri > 127 ) ri = 127;
-			
+
 			ssd1306_drawPixel( rr, ri, 1 );
 		}
 
@@ -791,7 +793,7 @@ int HandleHidUserGetReportSetup( struct _USBState * ctx, tusb_control_request_t 
 
 		for( ; i < 128; i++ )
 			((uint32_t*)(scratchpad))[i]  = 0;
-			
+
 
 		ctx->pCtrlPayloadPtr = scratchpad;
 		return 510;
@@ -829,7 +831,7 @@ void HandleHidUserReportOutComplete( struct _USBState * ctx )
 		if( numconfigs > 5) g_exactcompute = configs[7];
 		if( numconfigs > 6) g_goertzel_advance_r = configs[8];
 		if( numconfigs > 7) g_goertzel_advance_i = configs[9];
-		if( numconfigs > 8) 
+		if( numconfigs > 8)
 		{
 			int adc_buffer = configs[10];
 			if( adc_buffer )

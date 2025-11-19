@@ -2,7 +2,7 @@
 #define _USB_CONFIG_H
 
 #include "funconfig.h"
-#include "ch32v003fun.h"
+#include "ch32fun.h"
 
 #define FUSB_CONFIG_EPS       2 // Include EP0 in this count
 #define FUSB_SUPPORTS_SLEEP   0
@@ -44,15 +44,15 @@ static const uint8_t HIDAPIRepDesc[ ] =
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
 		HID_REPORT_COUNT   ( 63 ), // For use with `hidapitester --vidpid 1209/D003 --open --read-feature 171`
 		HID_REPORT_ID      ( 0xab )
-		HID_USAGE          ( 0x01 ),	
+		HID_USAGE          ( 0x01 ),
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
 		HID_REPORT_COUNT   ( 63 ), // For configuring the setup.
 		HID_REPORT_ID      ( 0xac )
-		HID_USAGE          ( 0x01 ),	
+		HID_USAGE          ( 0x01 ),
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
 		HID_REPORT_COUNT_N   ( 510,2 ), // For receiving IQ data on host.
 		HID_REPORT_ID      ( 0xad )
-		HID_USAGE          ( 0x01 ),	
+		HID_USAGE          ( 0x01 ),
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
 	HID_COLLECTION_END,
 };
@@ -147,7 +147,7 @@ const static struct descriptor_list_struct {
 
 	{0x00000300, (const uint8_t *)&string0, 4},
 	{0x04090301, (const uint8_t *)&string1, sizeof(STR_MANUFACTURER)},
-	{0x04090302, (const uint8_t *)&string2, sizeof(STR_PRODUCT)},	
+	{0x04090302, (const uint8_t *)&string2, sizeof(STR_PRODUCT)},
 	{0x04090303, (const uint8_t *)&string3, sizeof(STR_SERIAL)}
 };
 #define DESCRIPTOR_LIST_ENTRIES ((sizeof(descriptor_list))/(sizeof(struct descriptor_list_struct)) )

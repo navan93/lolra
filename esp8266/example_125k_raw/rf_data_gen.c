@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <stdint.h>
 
-const double center_frequency = 904.5;
+const double center_frequency = 868;
 const double bw = .125;
 const uint32_t memory_offset = 0x20000;
 #define SF_NUMBER 9
